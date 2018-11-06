@@ -1,0 +1,293 @@
+{% include "src/header.html" %}
+{% block body %}
+    <title>AppGML</title>
+    {{result}}
+    <span id="jsonNodeIP" class="hide">{{nodesIP}}</span>
+
+    <div class="row">
+
+        <a class="btn waves-effect waves-light " href="{{ url_for('block_chain')}}">
+            BlockChain
+        </a>
+
+        <a class="btn waves-effect waves-light " href="{{ url_for('logout')}}">
+            Deconnexion
+        </a>
+    </div>
+
+    <div class="row">
+        <form method="post" enctype=multipart/form-data>
+            <!-- <input type="file" name="file"/> -->
+
+            <div class="file-field input-field">
+                <div class="btn">
+                    <span>Fichier GML</span>
+                    <input type="file" name="file">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text" placeholder="Up Un Fichier GML">
+                </div>
+            </div>
+
+            <button class="btn waves-effect waves-light" type="submit" name="ioFile" value="ioFile">
+                Envoyer
+            </button>
+
+            <button class="btn waves-effect waves-light" type="submit" name="newIOFile" value="newIOFile">
+                Nouveau
+            </button>
+
+            <button class="btn waves-effect waves-light" type="submit" name="Deployer" value="Deployer">
+                Deployer
+            </button>
+        </form>
+    </div>
+
+
+    <div id="canvas" class="row"></div>
+
+    <ul class="collapsible">
+        <li>
+          <div class="collapsible-header">AddNode</div>
+          <div class="collapsible-body">
+             <form method="post">
+                 <div class="row">
+                     <div class="input-field col s6">
+                       <input placeholder="nom noeud" id="nodename" type="text" name="nodename" class="validate">
+                       <label for="nodename">Nodename</label>
+                     </div>
+
+                     <div class="input-field col s6">
+                       <input placeholder="10.0.0.1" id="nodeip" type="text" name="nodeip" >
+                       <label for="nodeip">nodeip</label>
+                     </div>
+
+                 </div>
+
+                 <button class="btn row col s6 waves-effect waves-light" type="submit" name="newNode" value="newNode">
+                     Envoyer
+                 </button>
+             </form>
+          </div>
+        </li>
+        <li>
+            <div class="collapsible-header">DeleteNode</div>
+            <div class="collapsible-body">
+               <form method="post">
+                   <div class="input-field col s6">
+                       <div class="input-field col s6">
+                         <select name="nodeD">
+                         {% for node in nodes %}
+                              <option class="nodeD" >{{node}}</option>
+                         {% endfor %}
+                         </select>
+                         <label>SupprmerNode</label>
+                       </div>
+                     <button class="btn col s6 waves-effect waves-light" type="submit" name="deleteNode" value="deleteNode">
+                         Envoyer
+                     </button>
+                   </div>
+               </form>
+            </div>
+        </li>
+        <li>
+          <div class="collapsible-header">LinkNode</div>
+            <div class="collapsible-body">
+              <form method="post">
+                  <div class="row">
+                      <div class="input-field col s6">
+                        <select name="node1">
+                        {% for node in nodes %}
+                             <option class="node1">{{node}}</option>
+                        {% endfor %}
+                    </select>
+                        <label>Node</label>
+                      </div>
+
+                      <div class="input-field col s6">
+                        <select name="node2">
+                        {% for node in nodes %}
+                             <option class="node2" >{{node}}</option>
+                        {% endfor %}
+                        </select>
+                        <label>Node Edge</label>
+                      </div>
+
+                      <button class="btn col s6 waves-effect waves-light" type="submit" name="linknode" value="linknode">
+                          Link
+                      </button>
+                  </div>
+                </div>
+              </form>
+          </div>
+        </li>
+      </ul>
+
+    <!-- Modal Structure -->
+     <div id="modalAdd" class="modal">
+           <div class="modal-content">
+             <h4>Modal Header</h4>
+             <p>A bunch of text</p>
+           </div>
+           <div class="modal-footer">
+             <a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
+           </div>
+     </div>
+
+    <span id="testtest" class="hide">{{edges}}</span>
+
+    <div class="row">
+
+        <table>
+        <thead>
+          <tr>
+              <th>node</th>
+              <th>edges</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+            {% for node in nodes %}
+                <tr class="edges">
+                    <td class="node">{{node}}</td>
+                    <td class="nodeEdge">{{ get_this_edge(node,edges)}}</td>
+                 </tr>
+            {% endfor %}
+
+        </tbody>
+
+
+    </div>
+
+    {% if filename %}
+        <div class="row">
+            <p><strong> Fichier {{ filename }} <strong>
+        </div>
+    {% endif %}
+
+    {% if error %}
+        <div class="row">
+            <p><strong> {{ error }} <strong>
+        </div>
+    {% endif %}
+
+    <script>
+        $(document).ready(function(){
+
+            var G = new jsnx.Graph();
+            var test = "";
+
+            try {
+                test = $.parseJSON($("#jsonNodeIP").text());
+                console.log(test);
+            } catch (e) {
+                console.log("no json");
+            }
+
+
+            $('.nodeD').each(function(){
+               $(this).attr("value", $(this).val());
+            });
+
+            $('.node1').each(function(){
+               $(this).attr("value", $(this).val());
+               //G.addNode( $(this).val());
+            });
+
+            $('.node2').each(function(){
+               $(this).attr("value",$(this).val());
+            });
+
+            var existEdges= {};
+
+            $(".edges").each(function(){
+                var node = $(this).find(".node").text();
+                var ip = getIP(test,node);
+                G.addNode(node, {ip: ip});
+                var nodeEdge = $(this).find(".nodeEdge").text().split('/');
+                $.each(nodeEdge,function(index,value){
+                    if ( $.trim(value) != ""){
+                        G.addEdge($.trim(node),$.trim(value));
+                    }
+                    // var test = true
+                    // test = checkEgdes(existEdges,node,value);
+                    // console.log(test);
+                    // if (value != "" && !checkEgdes(existEdges,node,value)){
+                    //
+                    //     existEdges[node] = {}
+                    //     existEdges[node][value] = "o";
+                    //     console.log(JSON.stringify(existEdges));
+                });
+            });
+
+            function getIP(json,key){
+                try {
+                    console.log(json[key]);
+                    return (json[key]);
+                } catch (e) {
+                    return ("");
+                }
+            }
+
+            function checkEgdes(edgesList,node,edge){
+                // var test = true;
+                // test = node in edgesList && edge in edgesList[node] || edge in edgesList && node in edgesList[edge];
+                // console.log(node + " " + edge + " " + test);
+                return (node in edgesList && edge in edgesList[node] || edge in edgesList && node in edgesList[edge]);
+            }
+
+            // $(".edges").each(function(){
+            //     var node = $(this).find(".node").text();
+            //     //console.log(node);
+            //     var existLink = [];
+            //     var nodeEdge = $(this).find(".nodeEdge").text().split('/');
+            //     $.each(nodeEdge,function(index,value){
+            //
+            //         if (value == "") {
+            //             G.addNode(node);
+            //         } else {
+            //
+            //             $.each(exsitLink,function(index,test){
+            //                 print(test.indexof(node) >= 0 && test.indexof(value) >= 0)
+            //             });
+            //             G.addEdge(node,value);
+            //             existLink.append(node+value);
+            //
+            //         }
+            //     })
+            // });
+
+            $('select').material_select();
+
+            var color = d3.scale.category20();
+            jsnx.draw(G, {
+               element: '#canvas',
+               withLabels: true,
+               height: 750,
+               labelStyle: {fill: 'black'},
+               stickyDrag: true,
+               layoutAttr: {
+                   charge: -120,
+                   linkDistance: 20
+               },
+               nodeAttr: {
+                   r: 1,
+                   title: function(d) {
+                       return (d.data.ip);
+                   }
+               },
+               nodeStyle: {
+                   fill: 'white',
+                   stroke: 'none'
+               },
+               edgeStyle: {
+                   fill: '#999'
+               }
+            });
+
+        });
+
+    </script>
+
+{% endblock %}

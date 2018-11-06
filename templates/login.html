@@ -1,0 +1,25 @@
+{% include "src/header.html" %}
+{% extends "layout.html" %}
+{% block body %}
+
+	<form method="post">
+		<div class="row">
+			<div class="input-field col s6">
+			  <input placeholder="Identifiant" name="username" type="text" class="validate">
+			  <label for="username">Identifiant</label>
+			</div>
+			<div class="input-field col s6">
+			  <input name="password" type="password" class="validate">
+			  <label for="password">Password</label>
+			</div>
+		</div>
+		<div class="row col s6 center">
+			<button class="btn waves-effect waves-light " type="submit" name="action">
+				Login
+			 </button>
+		 </div>
+	</form>
+	{% if error %}
+		<p class=error><strong> {{ error }} <strong>
+	{% endif %}
+{% endblock %}

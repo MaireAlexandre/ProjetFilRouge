@@ -1,0 +1,15 @@
+<!doctype html>
+{% block header %}
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/materialize.min.css') }}">
+    <script type="text/javascript" src="{{ url_for('static',filename='scripts/jquery.js') }}"></script>
+    <script src="https://d3js.org/d3.v3.js"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='scripts/materialize.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='scripts/jsnetworkx.js') }}"></script>
+
+</head>
+
+<div class="row col s12 center">
+    <span> APPGML Application </span>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block body %}
+	<p>page de garde APPGML</p>
+	<h1>Uploadé un fichier</h1>
+
+	<p><a href="{{ url_for('block_chain')}}">Direction Block Chain</a>
+
+	<form method=post enctype=multipart/form-data>
+	<p><input type=file name=file>
+	   <input type=submit value=Upload>
+	</form>
+	{% if error %}
+		<p class=error> {{ error }}</p>
+	{% endif %}
+		
+		
+		
+	<p><a href="{{ url_for('logout')}}">Deconnexion</a>
+{% endblock %}
+
