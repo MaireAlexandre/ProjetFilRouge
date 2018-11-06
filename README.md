@@ -1,20 +1,18 @@
 # ProjetSouhi2017
-Projet de routage(topologie de r�seau 2017)
+Projet de routage(topologie de reseau 2017)
 
 #MODIFIEZ LE CHEMIN D'IMPORTATION POUR LE FICHIER
 
-# Cahier des Charges
-(A remplir)
+
 
 # gestion de projet
-A definir(AGILE)
+Xtreme Programming
 
 # Premiere Partie
 Dead linecJanv 2017
 
 Configuration du serveur DHCP (README_conf_DHCP.txt)
 
-#test: je joue avec flask et je fais les IHM Demandé
 
 # Utilisation des scripts réseaux - python2.7
 
